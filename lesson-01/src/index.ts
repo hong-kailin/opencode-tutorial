@@ -12,6 +12,11 @@
  */
 
 import "dotenv/config"
+
+// 关闭 AI SDK 兼容性警告（智谱 AI 使用 v1 规范，ai SDK 自动降级到 v2 兼容模式）
+// @ts-ignore
+globalThis.AI_SDK_LOG_WARNINGS = false
+
 import { Effect } from "effect"
 import { runAgentLoop } from "./agent.js"
 

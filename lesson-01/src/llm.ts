@@ -2,46 +2,53 @@
  * LLM 调用模块
  * 
  * 职责：
- * 1. 初始化 ai SDK provider（OpenAI）
- * 2. 流式调用 LLM
+ * 1. 初始化 ai SDK provider（兼容 OpenAI API）
+ * 2. 流式调用 GLM-5.1 模型
  * 3. 实时输出 token 到终端
  * 4. 返回完整响应文本
  * 
  * 对应原项目：packages/opencode/src/provider/provider.ts
+ * 
+ * 本文件使用智谱 AI (BigModel) 的 OpenAI 兼容 API
+ * 文档：https://docs.bigmodel.cn/cn/guide/develop/openai/introduction
  */
 
 import { Effect } from "effect"
-import { createOpenAI } from "@ai-sdk/openai"
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { streamText } from "ai"
 
 // 从环境变量读取配置
-const apiKey = process.env.OPENAI_API_KEY
-const baseURL = process.env.OPENAI_BASE_URL
+// 智谱 AI 使用 ZHIPU_API_KEY 作为 API Key
+// baseURL 固定为智谱 AI 的 OpenAI 兼容接口地址
+const apiKey = process.env.ZHIPU_API_KEY
+const baseURL = process.env.ZHIPU_BASE_URL || "https://open.bigmodel.cn/api/paas/v4/"
 
 if (!apiKey) {
-  console.error("❌ 请设置 OPENAI_API_KEY 环境变量")
+  console.error("❌ 请设置 ZHIPU_API_KEY 环境变量")
   console.error("   cp .env.example .env")
-  console.error("   然后编辑 .env 填入你的 API Key")
+  console.error("   然后编辑 .env 填入你的智谱 AI API Key")
+  console.error("   可以从 https://bigmodel.cn/usercenter/proj-mgmt/apikeys 获取")
   process.exit(1)
 }
 
-// 创建 OpenAI provider
-// 通过 baseURL 可以兼容其他 OpenAI-compatible 服务（如 OpenRouter、SiliconFlow）
-const openai = createOpenAI({
+// 创建兼容 OpenAI API 的 provider
+// 使用 createOpenAICompatible 替代 createOpenAI，支持第三方兼容 API
+const bigmodel = createOpenAICompatible({
+  name: "bigmodel",
   apiKey,
   baseURL,
 })
 
 /**
- * 调用 LLM 生成回复
+ * 调用 GLM-5.1 生成回复
  * 
  * @param messages - 对话历史（包含 system、user、assistant 消息）
  * @returns Effect，成功时返回完整响应文本
  */
 export const callLLM = (messages: Array<{ role: string; content: string }>) =>
   Effect.gen(function* () {
-    // 使用 gpt-4o-mini 模型（便宜且速度快）
-    const model = openai("gpt-4o-mini")
+    // 使用 GLM-5.1 模型
+    const model = bigmodel("glm-5.1")
 
     // streamText：流式生成文本
     // 注意：streamText 是同步返回 StreamTextResult 的

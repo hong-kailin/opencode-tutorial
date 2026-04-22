@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+bun.lock
+package-lock.json
+
+# Environment variables
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Build outputs
+dist/
+build/
+
+# OS files
+.DS_Store
