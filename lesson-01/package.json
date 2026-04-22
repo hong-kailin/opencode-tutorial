@@ -1,0 +1,19 @@
+{
+  "name": "lesson-01-minimal-agent",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ai": "^6.0.0",
+    "@ai-sdk/openai": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "effect": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0"
+  }
+}
